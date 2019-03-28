@@ -1,0 +1,9 @@
+Adding SVG / D3 onto maps as overlays
+http://bl.ocks.org/enjalot/0d87f32a1ccb9a720d29ba74142ba365
+https://bl.ocks.org/mbostock/899711
+http://techslides.com/demos/d3/worldmap-template.html
+https://www.knoyd.com/blog/2017/6/23/create-map-in-d3-part1
+***https://bost.ocks.org/mike/leaflet/
+https://gist.github.com/DeEgge/ba386d71b5d0157e2195da02a3d4453b
+http://bl.ocks.org/d3noob/9267535
+http://www.storybench.org/one-way-give-national-map-geographical-detail/

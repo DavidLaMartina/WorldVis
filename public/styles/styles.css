@@ -1,0 +1,11 @@
+html, body, #main-container, #main-row, #map-container, #map{
+  height: 100%;
+}
+#map-container{
+  padding: 0;
+}
+svg{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
