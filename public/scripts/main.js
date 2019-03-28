@@ -6,7 +6,7 @@ var map = new mapboxgl.Map({
   center: [0,0],
   style: 'mapbox://styles/mapbox/satellite-v9'
 });
-map.setMaxBounds(map.getBounds());
+map.setMaxBounds(map.getBounds());    // Prevent
 
 var container = map.getCanvasContainer();
 var svg = d3.select(container).append('svg')
@@ -44,8 +44,10 @@ d3.json(url, function(err, data){
     .append('path')
     .classed('country', true)
     .attr('d', path)
-    // .merge(update)
-    .attr('fill', 'green');
+    .attr('fill', 'blue')
+    .attr('fill-opacity', 0.6)
+    .attr('stroke', 'black')
+    .attr('stroke-width', 1)
 
   function render(){
     projection = getD3();
