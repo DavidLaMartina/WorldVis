@@ -4,41 +4,68 @@
     <meta charset="utf-8">
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <title>WorldVis</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel='stylesheet' href='styles/styles.css'>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
     <script
-      src="http://code.jquery.com/jquery-3.3.1.min.js"
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
       crossorigin="anonymous"></script>
   </head>
   <body>
     <div class='container-fluid' id='main-container'>
       <!-- Top / 'Nav' -->
-
+      <div class='row'>
+        <div id="nav">
+          <h2>CO<sub>2</sub> Dashboard</h2>
+          <p>
+            Explore CO<sub>2</sub> emissions by year.
+            Current year: <span id="year-val"></span>
+            <input id="year" type="range" step="1">
+          </p>
+          <p>
+            Choose between total emissions or emissions per capita.
+            <input type="radio" name="data-type" value="emissions" checked>
+            <label>Emissions</label>
+            <input type="radio" name="data-type" value="emissionsPerCapita">
+            <label>Emissions Per Capita</label>
+          </p>
+          <p>Click on a country to see its trends by year.</p>
+        </div>
+      </div>
 
 
       <!-- Body: Map and Data -->
       <div class='row' id='main-row'>
-        <div class='col ' id='map-container'>
+        <div class='col chart-container' id='map-container'>
           <div id='map'>
-
           </div>
         </div>
-        <div class='col'>
-          <div class='row'>
 
+        <div class='col chart-container'>
+          <div class='row'>
+            <div class='container' id='data-top'>
+            </div>
           </div>
           <div class='row'>
-
+            <div class='container' id='data-bottom'>
+              <svg
+                version="1.1"
+                baseProfile="full"
+                xmlns="http://www.w3.org/2000/svg"
+                id="bar">
+              </svg>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <div class='tooltip'></div>
     <script src='https://d3js.org/d3.v4.js'></script>
     <script src="https://unpkg.com/topojson@3"></script>
+    <script src='scripts/bar.js'></script>
     <script src='scripts/main.js'></script>
     <script src='scripts/map.js'></script>
   </body>

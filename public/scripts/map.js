@@ -1,11 +1,74 @@
-function createMap(width, height){
-  d3.select('#map-svg')
-    .attr('width', width)
-    .attr('height', height)
+function drawMap(svg, geoData, data, year, dataType){
+  var projection = getProjection();
+  var path = d3.geoPath().projection(projection);
+
+  d3.select('#year-val').text(year);
+
+  geoData.forEach(d => {
+    var countries = data.filter(row => row.countryCode === d.id)
+    var name = '';
+    if (countries.length > 0) name = countries[0].country;
+    d.properties = countries.find(c => c.year === year) || { country: name };
+  });
+
+  var colors = ["#f1c40f", "#e67e22", "#e74c3c", "#c0392b"];
+
+  var domains = {
+    emissions: [0, 2.5e5, 1e6, 5e6],
+    emissionsPerCapita: [0, 0.5, 2, 10]
+  };
+
+  var mapColorScale = d3.scaleLinear()
+    .domain(domains[dataType])
+    .range(colors);
+
+  var update = svg.selectAll('.country').data(geoData);
+
+  update
+    .enter()
+    .append('path')
+      .classed('country', true)
+      .attr('d', path)
+      .on('click', function(){
+        var currentDataType = d3.select('input:checked')
+          .property('value');
+        var country = d3.select(this);
+        var isActive = country.classed('active');
+        var countryName = isActive ? '' : country.data()[0].properties.country;
+        // drawBar(data, currentDataType, countryName);
+        // highlightBars(+d3.select('#year').property('value'));
+        d3.selectAll('.country').classed('active', false);
+        country.classed('active', !isActive);
+    })
+    .merge(update)
+      .transition()
+      .duration(750)
+      .attr('fill', d => {
+        var val = d.properties[dataType];
+        return val ? mapColorScale(val) : '#ccc';
+      })
+    // .attr('fill', 'blue')
+    .attr('fill-opacity', 0.6)
+    .attr('stroke', 'black')
+    .attr('stroke-width', 1)
+
+    map.on('viewreset', () => renderCountries(svg, path));
+    map.on('move', () => renderCountries(svg, path));
+    renderCountries(svg, path)
 }
-function drawMap(geoData){
-  var map = d3.select('#map-svg')
+function getProjection(){
+  var bbox = $('#map').get(0).getBoundingClientRect();
+  var center = map.getCenter();
+  var zoom = map.getZoom();
+  var scale = (512) * 0.5 / Math.PI * Math.pow(2, zoom);
   var projection = d3.geoMercator()
-    .scale(110)
-    .translate()
+    .center([center.lng, center.lat])
+    .translate([bbox.width/2, bbox.height/2])
+    .scale(scale);
+  return projection;
+}
+function renderCountries(svg, path){
+  projection = getProjection();
+  path.projection(projection);
+  svg.selectAll('.country').attr('d', path);
 }

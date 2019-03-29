@@ -1,61 +1,117 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGxhbWFydGluYSIsImEiOiJjanRsa3V6ZjAwOTljM3lvamwzeTE2bmp2In0.o8FGySTUwN0IG1NOcL3HKg';
-
+var sw = new mapboxgl.LngLat(-180, -85);
+var ne = new mapboxgl.LngLat(180, 85);
+var llb = new mapboxgl.LngLatBounds(sw, ne);
 var map = new mapboxgl.Map({
   container: 'map',
   zoom: 1,
   center: [0,0],
-  style: 'mapbox://styles/mapbox/satellite-v9'
+  style: 'mapbox://styles/mapbox/satellite-v9',
 });
-map.setMaxBounds(map.getBounds());    // Prevent
+map.setMaxBounds(llb);    // Prevent panning outside bounds
 
-var container = map.getCanvasContainer();
-var svg = d3.select(container).append('svg')
-  .attr('id', 'map-svg');
-
-function getD3(){
-  // var bbox = container.getBoundingClientRect();
-  var bbox = $('#map').get(0).getBoundingClientRect();
-  var center = map.getCenter();
-  var zoom = map.getZoom();
-  var scale = (512) * 0.5 / Math.PI * Math.pow(2, zoom);
-  var d3projection = d3.geoMercator()
-    .center([center.lng, center.lat])
-    .translate([bbox.width/2, bbox.height/2])
-    .scale(scale)
-  return  d3projection;
-}
-var d3projection = getD3();
-// var url = 'http://unpkg.com/world-atlas@1.1.4/world/50m.json';
+// var mapURL = 'http://unpkg.com/world-atlas@1.1.4/world/50m.json';
 //  110m significantly more performant during pan / zoom
-var url = 'http://unpkg.com/world-atlas@1.1.4/world/110m.json';
+var mapURL = 'http://unpkg.com/world-atlas@1.1.4/world/110m.json';
 
-d3.json(url, function(err, data){
-  var geoData = topojson.feature(data, data.objects.countries).features;
+d3.queue()
+  .defer(d3.json, mapURL)
+  .defer(d3.csv, './data/all_data.csv', function(row){
+    return{
+      continent: row.Continent,
+      country: row.Country,
+      countryCode: row["Country Code"],
+      emissions: +row["Emissions"],
+      emissionsPerCapita: +row["Emissions Per Capita"],
+      region: row.Region,
+      year: +row.Year
+    }
+  })
+  .await(function(error, mapData, data){
+    if(error) throw error;
+    var extremeYears = d3.extent(data, d => d.year);
+    var currentYear = extremeYears[0];
+    var currentDataType = d3.select('input[name="data-type"]:checked')
+                            .attr("value");
+    var geoData = topojson.feature(mapData, mapData.objects.countries).features;
 
-  var mapSvg = d3.select('#map-svg');
-  var projection = getD3();
-  var path = d3.geoPath().projection(projection);
+    var width = +d3.select(".chart-container")
+                   .node().offsetWidth;
+    var height = 300;
 
-  var update = mapSvg.selectAll('.country')
-    .data(geoData);
+    // Create the map
+    var svg = d3.select(map.getCanvasContainer()).append('svg')
+      .attr('id', 'map-svg');
+    drawMap(svg, geoData, data, currentYear, currentDataType);
 
-  update
-    .enter()
-    .append('path')
-    .classed('country', true)
-    .attr('d', path)
-    .attr('fill', 'blue')
-    .attr('fill-opacity', 0.6)
-    .attr('stroke', 'black')
-    .attr('stroke-width', 1)
+    //
+    createBar(width, height);
+    //
+    drawBar(data, currentDataType, '');
 
-  function render(){
-    projection = getD3();
-    path.projection(projection)
-    mapSvg.selectAll('.country')
-      .attr('d', path)
+    d3.select('#year')
+      .property('min', currentYear)
+      .property('max', extremeYears[1])
+      .property('value', currentYear)
+      .on('input', () => {
+        currentYear = +d3.event.target.value;
+        drawMap(svg, geoData, data, currentYear, currentDataType);
+        //
+        // highlightBars(currentYear);
+      })
+    d3.selectAll('input[name="data-type"]')
+      .on('change', () => {
+        var active = d3.select('.active').data()[0];
+        var country = active ? active.properties.country : '';
+        currentDataType = d3.event.target.value;
+        drawMap(svg, geoData, data, currentYear, currentDataType);
+        // drawBar(data, currentDataType, country);
+      });
+    d3.selectAll('svg')
+      .on('mousemove touchmove', updateTooltip);
+
+    function updateTooltip(){
+      var tooltip = d3.select('.tooltip');
+      var tgt = d3.select(d3.event.target);
+      var isCountry = tgt.classed('country');
+      var isBar = tgt.classed('bar');
+      var isArc = tgt.classed('arc');
+      var dataType = d3.select('input:checked')
+        .property('value');
+      var units = dataType === 'emissions' ? 'thousand metric tons' : 'metric tons per capita';
+      var data;
+      var percentage = '';
+      if (isCountry) data = tgt.data()[0].properties;
+      if (isArc){
+        data = tgt.data()[0].data;
+        percentage = `<p>Percentage of total: ${getPercentage(tgt.data()[0])}</p>`;
+      }
+      if (isBar) data = tgt.data()[0];
+      tooltip
+          .style("opacity", +(isCountry || isArc || isBar))
+          .style("left", (d3.event.pageX - tooltip.node().offsetWidth / 2) + "px")
+          .style("top", (d3.event.pageY - tooltip.node().offsetHeight - 10) + "px");
+      if (data) {
+        var dataValue = data[dataType] ?
+          data[dataType].toLocaleString() + " " + units :
+          "Data Not Available";
+        tooltip
+            .html(`
+              <p>Country: ${data.country}</p>
+              <p>${formatDataType(dataType)}: ${dataValue}</p>
+              <p>Year: ${data.year || d3.select("#year").property("value")}</p>
+              ${percentage}
+            `)
+      }
+    }
+  });
+
+  function formatDataType(key) {
+    return key[0].toUpperCase() + key.slice(1).replace(/[A-Z]/g, c => " " + c);
   }
-  map.on('viewreset', render)
-  map.on('move', render)
-  // render();
-})
+
+  function getPercentage(d) {
+    var angle = d.endAngle - d.startAngle;
+    var fraction = 100 * angle / (Math.PI * 2);
+    return fraction.toFixed(2) + "%";
+  }
