@@ -35,8 +35,8 @@ function drawMap(svg, geoData, data, year, dataType){
         var country = d3.select(this);
         var isActive = country.classed('active');
         var countryName = isActive ? '' : country.data()[0].properties.country;
-        // drawBar(data, currentDataType, countryName);
-        // highlightBars(+d3.select('#year').property('value'));
+        drawBar(data, currentDataType, countryName);
+        highlightBars(+d3.select('#year').property('value'));
         d3.selectAll('.country').classed('active', false);
         country.classed('active', !isActive);
     })
@@ -47,7 +47,6 @@ function drawMap(svg, geoData, data, year, dataType){
         var val = d.properties[dataType];
         return val ? mapColorScale(val) : '#ccc';
       })
-    // .attr('fill', 'blue')
     .attr('fill-opacity', 0.6)
     .attr('stroke', 'black')
     .attr('stroke-width', 1)

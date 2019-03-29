@@ -1,18 +1,15 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGxhbWFydGluYSIsImEiOiJjanRsa3V6ZjAwOTljM3lvamwzeTE2bmp2In0.o8FGySTUwN0IG1NOcL3HKg';
-var sw = new mapboxgl.LngLat(-180, -85);
-var ne = new mapboxgl.LngLat(180, 85);
-var llb = new mapboxgl.LngLatBounds(sw, ne);
 var map = new mapboxgl.Map({
   container: 'map',
   zoom: 1,
   center: [0,0],
   style: 'mapbox://styles/mapbox/satellite-v9',
+  maxBounds: [[-180, -85], [180, 85]]
 });
-map.setMaxBounds(llb);    // Prevent panning outside bounds
 
 // var mapURL = 'http://unpkg.com/world-atlas@1.1.4/world/50m.json';
 //  110m significantly more performant during pan / zoom
-var mapURL = 'http://unpkg.com/world-atlas@1.1.4/world/110m.json';
+var mapURL = 'https://unpkg.com/world-atlas@1.1.4/world/110m.json';
 
 d3.queue()
   .defer(d3.json, mapURL)
@@ -33,6 +30,7 @@ d3.queue()
     var currentYear = extremeYears[0];
     var currentDataType = d3.select('input[name="data-type"]:checked')
                             .attr("value");
+                            console.log(currentDataType)
     var geoData = topojson.feature(mapData, mapData.objects.countries).features;
 
     var width = +d3.select(".chart-container")
@@ -44,9 +42,9 @@ d3.queue()
       .attr('id', 'map-svg');
     drawMap(svg, geoData, data, currentYear, currentDataType);
 
-    //
+    createPie(width, height * 1.2);
     createBar(width, height);
-    //
+    drawPie(data, currentYear);
     drawBar(data, currentDataType, '');
 
     d3.select('#year')
@@ -56,16 +54,19 @@ d3.queue()
       .on('input', () => {
         currentYear = +d3.event.target.value;
         drawMap(svg, geoData, data, currentYear, currentDataType);
-        //
-        // highlightBars(currentYear);
+        drawPie(data, currentYear);
+        highlightBars(currentYear);
       })
     d3.selectAll('input[name="data-type"]')
       .on('change', () => {
         var active = d3.select('.active').data()[0];
         var country = active ? active.properties.country : '';
         currentDataType = d3.event.target.value;
+        console.log(d3.event)
+        console.log(d3.event.target)
+        console.log(d3.event.target.value)
         drawMap(svg, geoData, data, currentYear, currentDataType);
-        // drawBar(data, currentDataType, country);
+        drawBar(data, currentDataType, country);
       });
     d3.selectAll('svg')
       .on('mousemove touchmove', updateTooltip);

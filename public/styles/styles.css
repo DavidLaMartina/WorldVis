@@ -1,9 +1,13 @@
-html, body, #main-container, #main-row, #map-container{
-  height: 100%;
-}
-/* html, body, #main-container{
+/* html, body, #main-container, #main-row, #map-container{
   height: 100%;
 } */
+html, body, #main-container{
+  height: 100%;
+  padding: 10px;
+}
+#main-row{
+
+}
 #map-container{
   padding: 0;
   height: 670px;
@@ -15,6 +19,7 @@ html, body, #main-container, #main-row, #map-container{
 }
 #map-svg{
   position: absolute;
+  margin: 0;
   width: 100%;
   height: 100%;
 }
