@@ -17,6 +17,8 @@ app.set('port', process.env.PORT);
 app.set('mysql', mysql);
 app.set('view engine', 'ejs');
 
+app.use('/api/data', require('./routes/api/data'));
+
 app.get('/', function(req, res){
   res.render('index');
 })

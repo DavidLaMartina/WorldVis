@@ -7,3 +7,6 @@ https://www.knoyd.com/blog/2017/6/23/create-map-in-d3-part1
 https://gist.github.com/DeEgge/ba386d71b5d0157e2195da02a3d4453b
 http://bl.ocks.org/d3noob/9267535
 http://www.storybench.org/one-way-give-national-map-geographical-detail/
+
+SQL - importing from CSV
+http://www.mysqltutorial.org/import-csv-file-mysql-table/
