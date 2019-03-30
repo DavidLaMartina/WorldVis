@@ -1,6 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS Countries;
+DROP TABLE IF EXISTS Units;
 DROP TABLE IF EXISTS TotalEmissions;
 DROP TABLE IF EXISTS EmissionsPerCapita;
 DROP TABLE IF EXISTS RenewableWaterPerCapita;
@@ -23,6 +24,20 @@ LOAD DATA LOCAL INFILE 'data/countryCodes.csv'
   LINES TERMINATED BY '\n'
   IGNORE 1 ROWS
   (name, alpha2_code, alpha3_code, un_code, iso_code);
+
+CREATE TABLE Units(
+  id INT NOT NULL AUTO_INCREMENT,
+  units_name VARCHAR(255) NOT NULL,
+  table_name VARCHAR(255) NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
+LOAD DATA LOCAL INFILE 'data/units.csv'
+  INTO TABLE Units
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 ROWS
+  (units_name, table_name, display_name);
 
 CREATE TABLE TotalEmissions(
   id INT NOT NULL AUTO_INCREMENT,

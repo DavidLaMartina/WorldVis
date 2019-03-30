@@ -1,0 +1,5 @@
+units_name, table_name, display_name
+"Thousands of Metric Tons","TotalEmissions","Total Emissions"
+"Metric Tons Per Capita","EmissionsPerCapita","Emissions Per Capita"
+"Cubic Meters","RenewableWaterPerCapita","Renewable Water Per Capita"
+"% of Population with Access","ImprovedSanitationAccess","Improved Sanitation Access"

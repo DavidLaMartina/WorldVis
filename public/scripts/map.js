@@ -5,7 +5,7 @@ function drawMap(svg, geoData, data, year, dataType){
   d3.select('#year-val').text(year);
 
   geoData.forEach(d => {
-    var countries = data.filter(row => row.countryCode === d.id)
+    var countries = data.filter(row => row.un_code === parseInt(d.id))
     var name = '';
     if (countries.length > 0) name = countries[0].country;
     d.properties = countries.find(c => c.year === year) || { country: name };
@@ -18,9 +18,11 @@ function drawMap(svg, geoData, data, year, dataType){
     emissionsPerCapita: [0, 0.5, 2, 10]
   };
 
-  var mapColorScale = d3.scaleLinear()
-    .domain(domains[dataType])
-    .range(colors);
+  var mapColorScale = d3.scalePow()
+    // .domain(domains.emissions)
+    .domain([0, Math.max.apply(Math, data.map(function(o) { return o.data; }))])
+    // .domain(d3.extent(data, d => d.data))
+    .range(['yellow', 'red']);
 
   var update = svg.selectAll('.country').data(geoData);
 
@@ -41,10 +43,9 @@ function drawMap(svg, geoData, data, year, dataType){
         country.classed('active', !isActive);
     })
     .merge(update)
-      .transition()
-      .duration(750)
+      .transition().duration(750)
       .attr('fill', d => {
-        var val = d.properties[dataType];
+        var val = d.properties.data;
         return val ? mapColorScale(val) : '#ccc';
       })
     .attr('fill-opacity', 0.6)
