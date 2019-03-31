@@ -10,3 +10,11 @@ http://www.storybench.org/one-way-give-national-map-geographical-detail/
 
 SQL - importing from CSV
 http://www.mysqltutorial.org/import-csv-file-mysql-table/
+
+Heroku ClearDB
+mysql://b628454daf1b5a:19a4ae42@us-cdbr-iron-east-03.cleardb.net/heroku_73aae69f32f9eae?reconnect=true
+
+username: b628454daf1b5a
+pass: 19a4ae42
+host: us-cdbr-iron-east-03.cleardb.net
+database name: heroku_73aae69f32f9eae

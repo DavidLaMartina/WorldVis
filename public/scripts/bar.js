@@ -70,16 +70,18 @@ function drawBar(data, dataType, country) {
       .call(yAxis);
 
   var axisLabel = data.units.filter(d => d.table_name === $('#data-select').val())[0].units_name;
-
+  var barTitle = country ?
+    data.units.filter(d => d.table_name === $('#data-select').val())[0].display_name + ', ' + country :
+    "Click on a country to see annual trends";
   // $('#data-select').val();
 
   // var axisLabel = dataType === "emissions" ?
   //   "CO2 emissions, thousand metric tons" :
   //   "CO2 emissions, metric tons per capita";
 
-  var barTitle = country ?
-    "CO2 Emissions, " + country :
-    "Click on a country to see annual trends.";
+  // var barTitle = country ?
+  //   "CO2 Emissions, " + country :
+  //   "Click on a country to see annual trends.";
 
   d3.select(".y-axis-label")
       .text(axisLabel);
