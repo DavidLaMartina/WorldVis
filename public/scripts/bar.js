@@ -42,10 +42,10 @@ function drawBar(data, dataType, country) {
   var barPadding = 1;
   var width = +bar.attr("width");
   var height = +bar.attr("height");
-  var countryData = data.filter(d => d.country === country)
+  var countryData = data.data.filter(d => d.country === country)
                         .sort((a, b) => a.year - b.year);
   var xScale = d3.scaleLinear()
-                 .domain(d3.extent(data, d => d.year))
+                 .domain(d3.extent(data.data, d => d.year))
                  .range([padding.left, width - padding.right]);
 
   var yScale = d3.scaleLinear()

@@ -5,7 +5,7 @@ function drawMap(svg, geoData, data, year, dataType){
   d3.select('#year-val').text(year);
 
   geoData.forEach(d => {
-    var countries = data.filter(row => row.un_code === parseInt(d.id))
+    var countries = data.data.filter(row => row.un_code === parseInt(d.id))
     var name = '';
     if (countries.length > 0) name = countries[0].country;
     d.properties = countries.find(c => c.year === year) || { country: name };
@@ -20,7 +20,7 @@ function drawMap(svg, geoData, data, year, dataType){
 
   var mapColorScale = d3.scalePow()
     // .domain(domains.emissions)
-    .domain([0, Math.max.apply(Math, data.map(function(o) { return o.data; }))])
+    .domain([0, Math.max.apply(Math, data.data.map(function(o) { return o.data; }))])
     // .domain(d3.extent(data, d => d.data))
     .range(['yellow', 'red']);
 

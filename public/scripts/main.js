@@ -1,7 +1,7 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGxhbWFydGluYSIsImEiOiJjanRsa3V6ZjAwOTljM3lvamwzeTE2bmp2In0.o8FGySTUwN0IG1NOcL3HKg';
 var map = new mapboxgl.Map({
   container: 'map',
-  zoom: 1,
+  zoom: 0,
   center: [0,0],
   style: 'mapbox://styles/mapbox/satellite-v9',
   maxBounds: [[-180, -85], [180, 85]]
@@ -34,12 +34,12 @@ function getData(dataType){
       // create the map
       var svg = d3.select(map.getCanvasContainer()).append('svg')
         .attr('id', 'map-svg');
-      drawMap(svg, geoData, data.data, currentYear /*, currentDataType */);
+      drawMap(svg, geoData, data, currentYear /*, currentDataType */);
 
-      // createPie(width, height);
+      createPie(width, height);
       createBar(width, height);
-      // drawPie(data, currentYear);
-      drawBar(data.data, dataType, '');
+      drawPie(data, currentYear);
+      drawBar(data, dataType, '');
 
       d3.select('#year')
         .property('min', currentYear)
@@ -47,7 +47,7 @@ function getData(dataType){
         .property('value', currentYear)
         .on('input', () => {
           currentYear = +d3.event.target.value;
-          drawMap(svg, geoData, data.data, currentYear /*, currentDataType*/);
+          drawMap(svg, geoData, data, currentYear /*, currentDataType*/);
           drawPie(data, currentYear);
           highlightBars(currentYear);
         })
@@ -83,12 +83,12 @@ function updateTooltip(data, dataType){
   var tip_data;
   var percentage = '';
   if (isCountry) tip_data = tgt.data()[0].properties;
-  // if (isArc){
-  //   data = tgt.data()[0].data;
-  //   percentage = `<p>Percentage of total: ${getPercentage(tgt.data()[0])}</p>`;
-  // }
-  // if (isBar) data = tgt.data()[0];
-  else tip_data = tgt.data()[0];
+  if (isArc){
+    tip_data = tgt.data()[0].data;
+    percentage = `<p>Percentage of total: ${getPercentage(tgt.data()[0])}</p>`;
+  }
+  if (isBar) tip_data = tgt.data()[0];
+  // else tip_data = tgt.data()[0];
   tooltip
     .style("opacity", +(isCountry || isArc || isBar))
     .style("left", (d3.event.pageX - tooltip.node().offsetWidth / 2) + "px")

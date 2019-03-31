@@ -16,26 +16,28 @@
   <body>
     <div class='container-fluid' id='main-container'>
       <!-- Top / 'Nav' -->
-      <div class='row'>
-        <div id="nav">
-          <h2>World Data Dashboard</h2>
-          <p>
-            Map and plot data by year.
-            Current year: <span id="year-val"></span>
-            <input id="year" type="range" step="1">
-          </p>
-          <p>
-            Choose a data point to map.
-            <select id='data-select'></select>
-          </p>
-          <!-- <p>
-            Choose between total emissions or emissions per capita.
-            <input type="radio" name="data-type" value="emissions" checked>
-            <label>Emissions</label>
-            <input type="radio" name="data-type" value="emissionsPerCapita">
-            <label>Emissions Per Capita</label>
-          </p> -->
-          <p>Click on a country to see its trends by year.</p>
+      <div class='row' id='nav-row'>
+        <div class='col-md-12'>
+          <div id="nav">
+            <h2>World Data Dashboard</h2>
+            <p>
+              Map and plot data by year.
+              Current year: <span id="year-val"></span>
+              <input id="year" type="range" step="1">
+            </p>
+            <p>
+              Choose a data point to map.
+              <select id='data-select'></select>
+            </p>
+            <!-- <p>
+              Choose between total emissions or emissions per capita.
+              <input type="radio" name="data-type" value="emissions" checked>
+              <label>Emissions</label>
+              <input type="radio" name="data-type" value="emissionsPerCapita">
+              <label>Emissions Per Capita</label>
+            </p> -->
+            <p>Click on a country to see its trends by year.</p>
+          </div>
         </div>
       </div>
 
