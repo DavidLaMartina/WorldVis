@@ -36,21 +36,28 @@ function getData(dataType){
         .attr('id', 'map-svg');
       drawMap(svg, geoData, data.data, currentYear /*, currentDataType */);
 
+      // createPie(width, height);
+      createBar(width, height);
+      // drawPie(data, currentYear);
+      drawBar(data.data, dataType, '');
+
       d3.select('#year')
         .property('min', currentYear)
         .property('max', extremeYears[1])
         .property('value', currentYear)
         .on('input', () => {
           currentYear = +d3.event.target.value;
-          drawMap(svg, geoData, data.data, currentYear /*, currentDataType*/)
+          drawMap(svg, geoData, data.data, currentYear /*, currentDataType*/);
+          drawPie(data, currentYear);
+          highlightBars(currentYear);
         })
-      d3.selectAll('input[name="data-type"]')
+      d3.selectAll('option')
         .on('change', () => {
           var active = d3.select('.active').data()[0];
           var country = active ? active.properties.country : '';
           currentDataType = d3.event.target.value;
           drawMap(svg, geoData, data, currentYear, currentDataType);
-          // drawBar(data, currentDataType, country);
+          drawBar(data, currentDataType, country);
         });
       d3.selectAll('svg')
         .on('mousemove touchmove', () => updateTooltip(data, dataType) );
@@ -73,27 +80,27 @@ function updateTooltip(data, dataType){
   var isArc = tgt.classed('arc');
   // var dataType = d3.select('input:checked').property('value');
   var units = data.units.filter(u => u.table_name === dataType)[0].units_name;
-  var data;
+  var tip_data;
   var percentage = '';
-  if (isCountry) data = tgt.data()[0].properties;
+  if (isCountry) tip_data = tgt.data()[0].properties;
   // if (isArc){
   //   data = tgt.data()[0].data;
   //   percentage = `<p>Percentage of total: ${getPercentage(tgt.data()[0])}</p>`;
   // }
   // if (isBar) data = tgt.data()[0];
-  else data = tgt.data()[0];
+  else tip_data = tgt.data()[0];
   tooltip
     .style("opacity", +(isCountry || isArc || isBar))
     .style("left", (d3.event.pageX - tooltip.node().offsetWidth / 2) + "px")
     .style("top", (d3.event.pageY - tooltip.node().offsetHeight - 10) + "px");
-  if (data){
-    var dataValue = data.data ?
-      data.data.toLocaleString() + ' ' + units : 'Data Not Available';
+  if (tip_data){
+    var dataValue = tip_data.data ?
+      tip_data.data.toLocaleString() + ' ' + units : 'Data Not Available';
     tooltip
       .html(`
-        <p>Country: ${data.country}</p>
+        <p>Country: ${tip_data.country}</p>
         <p>${formatDataType(dataType)}: ${dataValue}</p>
-        <p>Year: ${data.year || d3.select("#year").property("value")}</p>
+        <p>Year: ${tip_data.year || d3.select("#year").property("value")}</p>
         ${percentage}
       `)
   }

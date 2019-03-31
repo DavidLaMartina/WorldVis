@@ -44,13 +44,12 @@ function drawBar(data, dataType, country) {
   var height = +bar.attr("height");
   var countryData = data.filter(d => d.country === country)
                         .sort((a, b) => a.year - b.year);
-
   var xScale = d3.scaleLinear()
                  .domain(d3.extent(data, d => d.year))
                  .range([padding.left, width - padding.right]);
 
   var yScale = d3.scaleLinear()
-                 .domain([0, d3.max(countryData, d => d[dataType])])
+                 .domain([0, d3.max(countryData, d => d.data)])
                  .range([height - padding.bottom, padding.top]);
 
   var barWidth = xScale(xScale.domain()[0] + 1) - xScale.range()[0];
@@ -70,9 +69,13 @@ function drawBar(data, dataType, country) {
       .duration(1000)
       .call(yAxis);
 
-  var axisLabel = dataType === "emissions" ?
-    "CO2 emissions, thousand metric tons" :
-    "CO2 emissions, metric tons per capita";
+  var axisLabel = data.units.filter(d => d.table_name === $('#data-select').val())[0].units_name;
+
+  // $('#data-select').val();
+
+  // var axisLabel = dataType === "emissions" ?
+  //   "CO2 emissions, thousand metric tons" :
+  //   "CO2 emissions, metric tons per capita";
 
   var barTitle = country ?
     "CO2 Emissions, " + country :
@@ -111,6 +114,6 @@ function drawBar(data, dataType, country) {
       .attr("width", barWidth - barPadding)
       .transition(t)
       .delay((d, i) => i * 100)
-        .attr("y", d => yScale(d[dataType]))
-        .attr("height", d => height - padding.bottom - yScale(d[dataType]));
+        .attr("y", d => yScale(d.data))
+        .attr("height", d => height - padding.bottom - yScale(d.data));
 }
