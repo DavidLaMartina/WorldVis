@@ -3,3 +3,6 @@ units_name, table_name, display_name
 "Metric Tons Per Capita","EmissionsPerCapita","Emissions Per Capita"
 "Cubic Meters","RenewableWaterPerCapita","Renewable Water Per Capita"
 "% of Population with Access","ImprovedSanitationAccess","Improved Sanitation Access"
+"Millions of US Dollars","GDPinCurrentPrices","GDP in Current Prices"
+"US Dollars","GDPperCapita","GDP per Capita"
+"Percent","GDPRealRatesOfGrowth","GDP Real Rates of Growth"

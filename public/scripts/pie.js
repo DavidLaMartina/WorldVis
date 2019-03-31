@@ -61,8 +61,6 @@ function drawPie(data, currentYear) {
       .attr('fill', d => colorScale(d.data.country))
       .attr("d", path);
 
-      console.log($('#data-select').text())
-
   pie.select(".pie-title")
       .text($('#data-select option:selected').text() + ' by Country, ' + currentYear);
 }

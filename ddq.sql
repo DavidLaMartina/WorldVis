@@ -6,6 +6,10 @@ DROP TABLE IF EXISTS TotalEmissions;
 DROP TABLE IF EXISTS EmissionsPerCapita;
 DROP TABLE IF EXISTS RenewableWaterPerCapita;
 DROP TABLE IF EXISTS ImprovedSanitationAccess;
+DROP TABLE IF EXISTS GDPs;
+DROP TABLE IF EXISTS GDPinCurrentPrices;
+DROP TABLE IF EXISTS GDPperCapita;
+DROP TABLE IF EXISTS GDPRealRatesOfGrowth;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -119,3 +123,63 @@ UPDATE ImprovedSanitationAccess, Countries
   SET ImprovedSanitationAccess.country = Countries.id
   WHERE Countries.alpha3_code = ImprovedSanitationAccess.alpha3_code;
 ALTER TABLE ImprovedSanitationAccess DROP alpha3_code;
+
+/* 3 separate-value GDP tables dependent on rows from GDPs - drop after creation */
+CREATE TABLE GDPs(
+  id INT NOT NULL AUTO_INCREMENT,
+  country INT,
+  year INT(4),
+  series VARCHAR(255),
+  data FLOAT DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT gdp_country FOREIGN KEY (country) REFERENCES Countries(id)
+);
+ALTER TABLE GDPs ADD un_code INT;
+LOAD DATA LOCAL INFILE 'data/GDP.csv'
+  INTO TABLE GDPs
+  FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 2 ROWS
+  (un_code, @dummy, year, series, data);
+UPDATE GDPs, Countries
+  SET GDPs.country = Countries.id
+  WHERE Countries.un_code = GDPs.un_code;
+ALTER TABLE GDPs DROP un_code;
+
+CREATE TABLE GDPinCurrentPrices(
+  id INT NOT NULL AUTO_INCREMENT,
+  country INT,
+  year INT(4),
+  data FLOAT DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT gdpcp_country FOREIGN KEY (country) REFERENCES Countries(id)
+);
+INSERT INTO GDPinCurrentPrices (country, year, data)
+  SELECT country, year, data FROM GDPs
+  WHERE series LIKE 'GDP in constant%';
+
+CREATE TABLE GDPperCapita(
+  id INT NOT NULL AUTO_INCREMENT,
+  country INT,
+  year INT(4),
+  data FLOAT DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT gdppc_country FOREIGN KEY (country) REFERENCES Countries(id)
+);
+INSERT INTO GDPperCapita (country, year, data)
+  SELECT country, year, data FROM GDPs
+  WHERE series LIKE 'GDP per capita%';
+
+CREATE TABLE GDPRealRatesOfGrowth(
+  id INT NOT NULL AUTO_INCREMENT,
+  country INT,
+  year INT(4),
+  data FLOAT DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT gdprrg_country FOREIGN KEY (country) REFERENCES Countries(id)
+);
+INSERT INTO GDPRealRatesOfGrowth (country, year, data)
+  SELECT country, year, data FROM GDPs
+  WHERE series LIKE 'GDP real rates%';
+
+DROP TABLE GDPs;
